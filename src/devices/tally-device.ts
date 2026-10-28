@@ -77,7 +77,7 @@ export function resolveTargetConfig(config: TallyLightConfig): { host: string; f
 export class TallyDevice extends EventEmitter {
   readonly config: TallyLightConfig;
   readonly host: string;
-  readonly fallbackIp?: string | undefined;
+  private fallbackIp?: string | undefined;
 
   private state: TallyLightState;
   private currentZones: RGB[];
@@ -144,6 +144,20 @@ export class TallyDevice extends EventEmitter {
 
   get name(): string {
     return this.config.name;
+  }
+
+  /**
+   * Dynamically update the discovered DHCP IP address for this device.
+   */
+  updateDynamicIp(newIp: string): void {
+    if (this.fallbackIp === newIp) return;
+    this.fallbackIp = newIp;
+    this.httpClient = new TallyMaHttpClient(this.host, this.config.httpPort ?? 80, {
+      fallbackIp: newIp,
+    });
+    this.state.fallbackIp = newIp;
+    this.state.lastUpdated = new Date().toISOString();
+    this.emit('change', this.getState());
   }
 
   getState(): TallyLightState {

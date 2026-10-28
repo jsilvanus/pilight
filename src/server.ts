@@ -343,6 +343,24 @@ export function createServer(options?: ServerOptions | undefined): {
     }
   });
 
+  // 14b. mDNS Discovery endpoints
+  app.get('/api/v1/discovery', async () => {
+    return {
+      discovered: manager.getDiscoveredDevices(),
+      count: manager.getDiscoveredDevices().length,
+    };
+  });
+
+  app.post<{ Body: { waitMs?: number | undefined } }>('/api/v1/discovery/scan', async (request) => {
+    const waitMs = request.body?.waitMs ?? 1500;
+    const discovered = await manager.getDiscovery().scan(waitMs);
+    return {
+      success: true,
+      count: discovered.length,
+      discovered,
+    };
+  });
+
   // 15. Server-Sent Events (SSE) stream
   app.get('/api/v1/events', (request, reply) => {
     reply.raw.setHeader('Content-Type', 'text/event-stream');

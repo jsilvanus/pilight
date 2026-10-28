@@ -9,34 +9,76 @@ import { TallyDevice } from './devices/tally-device.js';
 import { TallyMaUdpClient, TALLYMA_UDP_PORT } from './protocols/tallyma-udp.js';
 import { TallyMaHttpClient } from './protocols/tallyma-http.js';
 import { TallyMaCloudClient } from './protocols/tallyma-cloud.js';
+import { MdnsDiscoveryService, type DiscoveredLight, normalizeMdnsHostname } from './discovery/mdns-discovery.js';
 
 export interface ManagerOptions {
   cloudBrokerUrl?: string | undefined;
+  disableDiscovery?: boolean | undefined;
 }
 
 export class TallyManager extends EventEmitter {
   private devices = new Map<string, TallyDevice>();
   private sharedUdpClient: TallyMaUdpClient;
   private sharedCloudClient?: TallyMaCloudClient | undefined;
+  private discoveryService: MdnsDiscoveryService;
 
   constructor(options?: ManagerOptions) {
     super();
     this.sharedUdpClient = new TallyMaUdpClient();
+    this.discoveryService = new MdnsDiscoveryService();
 
     if (options?.cloudBrokerUrl) {
       this.sharedCloudClient = new TallyMaCloudClient({ brokerUrl: options.cloudBrokerUrl });
     }
+
+    if (!options?.disableDiscovery) {
+      this.discoveryService.start();
+
+      // Listen for DHCP IP discoveries or changes
+      this.discoveryService.on('ipChanged', ({ light }: { light: DiscoveredLight }) => {
+        this.updateDeviceDiscoveredIp(light);
+      });
+      this.discoveryService.on('discovered', (light: DiscoveredLight) => {
+        this.updateDeviceDiscoveredIp(light);
+        this.emit('deviceDiscovered', light);
+      });
+    }
+  }
+
+  private updateDeviceDiscoveredIp(light: DiscoveredLight): void {
+    const targetHost = light.hostname.toLowerCase();
+    for (const dev of this.devices.values()) {
+      if (dev.host.toLowerCase() === targetHost) {
+        dev.updateDynamicIp(light.ip);
+      }
+    }
+  }
+
+  getDiscovery(): MdnsDiscoveryService {
+    return this.discoveryService;
+  }
+
+  getDiscoveredDevices(): DiscoveredLight[] {
+    return this.discoveryService.getAllDiscovered();
   }
 
   /**
-   * Register a new tally light.
+   * Register a new tally light. Automatically binds discovered DHCP IP if not statically set.
    */
   registerDevice(config: TallyLightConfig): TallyDevice {
     if (this.devices.has(config.id)) {
       this.removeDevice(config.id);
     }
 
-    const device = new TallyDevice(config, {
+    // If fallbackIp wasn't provided, check dynamic mDNS discovery cache
+    const targetHost = config.host ?? config.ip ?? config.id;
+    const discoveredIp = this.discoveryService.getResolvedIp(targetHost);
+    const enrichedConfig: TallyLightConfig = {
+      ...config,
+      fallbackIp: config.fallbackIp ?? discoveredIp,
+    };
+
+    const device = new TallyDevice(enrichedConfig, {
       udp: this.sharedUdpClient,
       cloud: this.sharedCloudClient,
     });
@@ -206,5 +248,6 @@ export class TallyManager extends EventEmitter {
     if (this.sharedCloudClient) {
       await this.sharedCloudClient.disconnect();
     }
+    this.discoveryService.stop();
   }
 }

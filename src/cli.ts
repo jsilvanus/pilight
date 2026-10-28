@@ -103,6 +103,7 @@ Scope:
   - UDP is strictly reserved for high-rate moving animations.
 
 Usage:
+  pilight discover [--timeout <sec>]
   pilight set <target> <color|mode> [--udp]
   pilight cue <target> <pan-left|pan-right|zoom-in|zoom-out|operator-call>
   pilight cycle <target> [--speed <ms>]
@@ -156,6 +157,36 @@ export async function runCli(args: string[]): Promise<void> {
     const server = createServer({ port });
     await server.start();
     return;
+  }
+
+  if (command === 'discover') {
+    let timeoutSec = 2.0;
+    const tIdx = args.indexOf('--timeout');
+    if (tIdx !== -1 && args[tIdx + 1]) timeoutSec = parseFloat(args[tIdx + 1]!);
+
+    console.log(`\nScanning local network via mDNS for Tally-Ma lights (${timeoutSec}s)...`);
+    const { MdnsDiscoveryService } = await import('./discovery/mdns-discovery.js');
+    const discovery = new MdnsDiscoveryService();
+    const discovered = await discovery.scan(timeoutSec * 1000);
+    discovery.stop();
+
+    if (discovered.length === 0) {
+      console.log('No Tally-Ma lights responded on the network.\n');
+      return;
+    }
+
+    console.log(`\nDiscovered ${discovered.length} light(s):\n`);
+    console.log('  Unit ID   Hostname         DHCP IP Address   Method           Last Seen');
+    console.log('  -------   ---------------  ----------------  ---------------  ------------------------');
+    for (const d of discovered) {
+      const idStr = d.id.padEnd(9);
+      const hostStr = d.hostname.padEnd(16);
+      const ipStr = d.ip.padEnd(17);
+      const methodStr = d.discoveryMethod.padEnd(16);
+      console.log(`  ${idStr} ${hostStr} ${ipStr} ${methodStr} ${d.lastSeen}`);
+    }
+    console.log();
+    process.exit(0);
   }
 
   const rawTarget = args[1];

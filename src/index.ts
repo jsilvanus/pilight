@@ -3,6 +3,7 @@ export * from './protocols/tallyma-udp.js';
 export * from './protocols/tallyma-http.js';
 export * from './protocols/tallyma-cloud.js';
 export * from './devices/tally-device.js';
+export * from './coordinator.js';
 export * from './manager.js';
 export * from './server.js';
 export * from './cli.js';

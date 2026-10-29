@@ -31,6 +31,19 @@ export interface SystemStatusSnapshot {
   atlona?: {
     output1Input?: number | undefined;
     output2Input?: number | undefined;
+    output5Input?: number | undefined;
+    routes?: Record<number, number | null> | undefined;
+  } | undefined;
+  stt?: {
+    busy?: boolean | undefined;
+    voiceDetected?: boolean | undefined;
+  } | undefined;
+  captions?: {
+    flowing?: boolean | undefined;
+  } | undefined;
+  piOutputs?: {
+    output1Active?: boolean | undefined;
+    output2Active?: boolean | undefined;
   } | undefined;
 }
 
@@ -68,10 +81,33 @@ export function evaluateFacetColor(facet: SegmentFacet, snapshot: SystemStatusSn
       return [...TALLY_COLORS.off];
     }
     case 'atlona-output': {
-      const route = facet.output === 1 ? snapshot.atlona?.output1Input : snapshot.atlona?.output2Input;
+      const route = facet.output === 1
+        ? snapshot.atlona?.output1Input
+        : facet.output === 2
+          ? snapshot.atlona?.output2Input
+          : facet.output === 5
+            ? (snapshot.atlona?.output5Input ?? snapshot.atlona?.routes?.[5])
+            : snapshot.atlona?.routes?.[facet.output];
       if (route === 1) return [...TALLY_COLORS.purple];
       if (route && route > 1) return [...TALLY_COLORS.electricBlue];
       return [...TALLY_COLORS.off];
+    }
+    case 'atlona-input': {
+      const isRouted = snapshot.atlona?.output1Input === facet.input || snapshot.atlona?.output2Input === facet.input;
+      if (isRouted) return [...TALLY_COLORS.electricBlue];
+      return [...TALLY_COLORS.off];
+    }
+    case 'pi-output': {
+      const active = facet.output === 1 ? snapshot.piOutputs?.output1Active : snapshot.piOutputs?.output2Active;
+      return active ? [...TALLY_COLORS.pgm] : [...TALLY_COLORS.off];
+    }
+    case 'stt-state': {
+      if (snapshot.stt?.busy) return [...TALLY_COLORS.amber];
+      if (snapshot.stt?.voiceDetected) return [...TALLY_COLORS.prv];
+      return [...TALLY_COLORS.off];
+    }
+    case 'caption-state': {
+      return snapshot.captions?.flowing ? [...TALLY_COLORS.cyan] : [...TALLY_COLORS.off];
     }
     case 'manual': {
       return facet.color ?? [...TALLY_COLORS.off];

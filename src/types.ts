@@ -51,7 +51,11 @@ export type SegmentFacet =
   | { type: 'atem-recording' }                      // Recording (Red), Off (Black)
   | { type: 'atem-streaming' }                      // Streaming (Red), Off (Black)
   | { type: 'projector'; projector: 1 | 2 }         // On (Cyan), Warming/Cooling (Amber), Off (Black)
-  | { type: 'atlona-output'; output: 1 | 2 }        // Routed (Purple/Blue), Off (Black)
+  | { type: 'atlona-output'; output: number }        // Routed (Purple/Blue), Off (Black)
+  | { type: 'atlona-input'; input: number }         // Routed to any display (Purple/Blue), Off (Black)
+  | { type: 'pi-output'; output: 1 | 2 }            // On Air / Playing (Red), Off (Black)
+  | { type: 'stt-state' }                           // Speech/Busy (Amber/Green), Off (Black)
+  | { type: 'caption-state' }                       // Captions flowing (Cyan), Off (Black)
   | { type: 'manual'; color?: RGB | undefined };
 
 /**

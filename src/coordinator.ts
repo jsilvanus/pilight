@@ -264,7 +264,7 @@ export class FacetCoordinator extends EventEmitter {
   private async handleGatewayEvent(event: any): Promise<void> {
     if (!event || typeof event !== 'object') return;
 
-    if (event.type === 'atem' && event.data) {
+    if ((event.type === 'video-mixer' || event.type === 'atem') && event.data) {
       const data = event.data;
       await this.updateStatus({
         atem: {

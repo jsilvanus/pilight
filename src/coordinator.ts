@@ -291,6 +291,8 @@ export class FacetCoordinator extends EventEmitter {
         atlona: {
           output1Input: event.data.routes[1] ?? undefined,
           output2Input: event.data.routes[2] ?? undefined,
+          output5Input: event.data.routes[5] ?? undefined,
+          routes: event.data.routes,
         },
       });
     }

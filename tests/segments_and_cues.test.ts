@@ -134,3 +134,17 @@ test('Facet evaluator maps telemetry to broadcast colors', () => {
   // Atlona Output 1 -> Purple
   assert.deepEqual(evaluateFacetColor({ type: 'atlona-output', output: 1 }, snapshot), [161, 0, 255]);
 });
+
+test('Facet evaluator reads Atlona outputs 4 and 5 from the matrix routes', () => {
+  const snapshot: SystemStatusSnapshot = {
+    atlona: { output1Input: 2, output2Input: 2, output5Input: 2, routes: { 1: 2, 2: 2, 4: 3, 5: 3 } },
+  };
+
+  // Videomixer output 4 routed to a Pi -> Electric blue
+  assert.deepEqual(evaluateFacetColor({ type: 'atlona-output', output: 4 }, snapshot), [0, 102, 255]);
+  // Output 4 routed to Lukupulpetti (input 1) -> Purple
+  const lukupulpetti: SystemStatusSnapshot = { atlona: { routes: { 4: 1 } } };
+  assert.deepEqual(evaluateFacetColor({ type: 'atlona-output', output: 4 }, lukupulpetti), [161, 0, 255]);
+  // No route known -> Off
+  assert.deepEqual(evaluateFacetColor({ type: 'atlona-output', output: 4 }, { atlona: {} }), [0, 0, 0]);
+});

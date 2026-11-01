@@ -124,6 +124,7 @@ export class FacetCoordinator extends EventEmitter {
   private manager: TallyManager;
   private currentSnapshot: SystemStatusSnapshot = {};
   private sseAbortController: AbortController | null = null;
+  private sseRetryTimer: ReturnType<typeof setTimeout> | null = null;
   private pigatewayUrl?: string | undefined;
 
   constructor(manager: TallyManager, pigatewayUrl?: string) {
@@ -206,6 +207,7 @@ export class FacetCoordinator extends EventEmitter {
     this.stopPiGatewayListener();
     this.pigatewayUrl = pigatewayUrl;
     this.sseAbortController = new AbortController();
+    const signal = this.sseAbortController.signal;
 
     const connectSse = async () => {
       const url = `${this.pigatewayUrl}/api/v1/events`;
@@ -250,12 +252,17 @@ export class FacetCoordinator extends EventEmitter {
             }
           }
         }
+        console.warn('[FacetCoordinator] PiGateway SSE stream ended. Retrying in 3s...');
       } catch (err: any) {
-        if (err.name !== 'AbortError') {
-          console.warn(`[FacetCoordinator] PiGateway SSE disconnected (${err.message}). Retrying in 3s...`);
-          setTimeout(connectSse, 3000);
-        }
+        if (err.name === 'AbortError') return;
+        console.warn(`[FacetCoordinator] PiGateway SSE disconnected (${err.message}). Retrying in 3s...`);
       }
+      // PiLight works without the gateway: keep trying, also after a clean end of the stream.
+      if (signal.aborted) return;
+      this.sseRetryTimer = setTimeout(() => {
+        this.sseRetryTimer = null;
+        void connectSse();
+      }, 3000);
     };
 
     connectSse();
@@ -290,6 +297,10 @@ export class FacetCoordinator extends EventEmitter {
   }
 
   stopPiGatewayListener(): void {
+    if (this.sseRetryTimer) {
+      clearTimeout(this.sseRetryTimer);
+      this.sseRetryTimer = null;
+    }
     if (this.sseAbortController) {
       this.sseAbortController.abort();
       this.sseAbortController = null;

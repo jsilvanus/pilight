@@ -28,7 +28,7 @@ export function createServer(options?: ServerOptions | undefined): {
   const app = fastify({ logger: false });
   const manager = options?.manager ?? new TallyManager();
   const coordinator = options?.coordinator ?? new FacetCoordinator(manager);
-  const port = options?.port ?? 3200;
+  const port = options?.port ?? 3107;
   const host = options?.host ?? '0.0.0.0';
 
   // 1. Health check

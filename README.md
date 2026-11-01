@@ -10,7 +10,7 @@ Tally light controller service and CLI for **Tally-Ma Wireless Tally Lights**, d
   - **Free Segmenting**: Splitting the 9 LEDs into 2 or 3 custom groups to display concurrent statuses (e.g. YouTube stream, ATEM recording, and projector status on one light).
   - **Camera Director / PTZ Cues**: Directional animations (pan left, pan right, zoom in, zoom out) and operator-only rear calls (LEDs 1 & 9).
   - **Moving Animations**: Multi-zone animated effects like rainbow streaming.
-- **PiGateway Integration**: Subscribes to `pigateway` SSE (`http://localhost:3100/api/v1/events`), automatically driving lights from ATEM cuts, encoder status, YouTube live status, and Atlona matrix routes.
+- **PiGateway Integration**: Subscribes to `pigateway` SSE (`http://localhost:3000/api/v1/events`), automatically driving lights from ATEM cuts, encoder status, YouTube live status, and Atlona matrix routes.
 
 ---
 
@@ -59,7 +59,7 @@ pilight brightness tally01 high         # Sets brightness via HTTP /HIGH
 pilight rainbow tally01 --duration 5 --fps 20
 
 # Start HTTP REST API daemon
-pilight serve --port 3200
+pilight serve --port 3107
 ```
 
 ---
@@ -87,7 +87,7 @@ POST /api/v1/lights/tally01/segments
 
 ## HTTP REST API
 
-When running the service daemon (`pnpm start` or `pilight serve` on default port `3200`):
+When running the service daemon (`pnpm start` or `pilight serve` on default port `3107`):
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -116,8 +116,8 @@ When running the service daemon (`pnpm start` or `pilight serve` on default port
 
 ## Environment Variables
 
-- `PILIGHT_PORT`: HTTP server listen port (default `3200`).
+- `PILIGHT_PORT`: HTTP server listen port (default `3107`).
 - `PILIGHT_HOST`: HTTP server bind host (default `0.0.0.0`).
-- `PIGATEWAY_URL`: URL to connect to `pigateway` SSE (e.g. `http://127.0.0.1:3100`).
+- `PIGATEWAY_URL`: URL to connect to `pigateway` SSE (e.g. `http://127.0.0.1:3000`).
 - `PILIGHT_CLOUD_BROKER`: Optional MQTT broker URL (e.g. `mqtt://jnsl.asuscomm.com:18069`).
 - `PILIGHT_DEVICES`: Optional JSON array of initial devices to register on startup.

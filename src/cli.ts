@@ -135,7 +135,7 @@ Examples:
   pilight hold tally01 1                  # Sends HTTP /HOLDDATA?H=1
   pilight brightness tally01 high         # Sends HTTP /HIGH
   pilight rainbow tally01 --duration 5    # Streams moving rainbow via UDP (port 21324)
-  pilight serve --port 3200               # Starts HTTP REST API daemon
+  pilight serve --port 3107               # Starts HTTP REST API daemon
 `);
 }
 
@@ -148,7 +148,7 @@ export async function runCli(args: string[]): Promise<void> {
   }
 
   if (command === 'serve') {
-    let port = 3200;
+    let port = 3107;
     const portIdx = args.indexOf('--port');
     if (portIdx !== -1 && args[portIdx + 1]) {
       port = parseInt(args[portIdx + 1]!, 10);

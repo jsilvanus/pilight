@@ -37,7 +37,7 @@
     "service": "pilight",
     "displayName": "PiLight",
     "layer": "southbound-hardware",
-    "port": 3200,
+    "port": 3107,
     "ports": {},
     "healthEndpoint": "/health",
     "envPortVar": "PILIGHT_PORT"

@@ -203,7 +203,7 @@ export class FacetCoordinator extends EventEmitter {
   /**
    * Connects to PiGateway Server-Sent Events (SSE) to automatically follow ATEM, encoder, and projector events.
    */
-  startPiGatewayListener(pigatewayUrl: string = this.pigatewayUrl ?? 'http://127.0.0.1:3100'): void {
+  startPiGatewayListener(pigatewayUrl: string = this.pigatewayUrl ?? 'http://127.0.0.1:3000'): void {
     this.stopPiGatewayListener();
     this.pigatewayUrl = pigatewayUrl;
     this.sseAbortController = new AbortController();

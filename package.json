@@ -36,7 +36,7 @@
   "pi": {
     "service": "pilight",
     "displayName": "PiLight",
-    "layer": "southbound-hardware",
+    "layer": "Layer 1: Southbound hardware",
     "port": 3107,
     "ports": {},
     "healthEndpoint": "/health",

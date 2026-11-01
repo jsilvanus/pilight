@@ -19,16 +19,16 @@ Tally light controller service and CLI for **Tally-Ma Wireless Tally Lights**, d
 Requires **Node.js >= 22**.
 
 ```sh
-npm install
-npm run build
-npm test
+pnpm install
+pnpm run build
+pnpm test
 ```
 
 ---
 
 ## CLI Usage
 
-Run directly with `node bin/pilight.mjs` or `npm run cli -- <command>`:
+Run directly with `node bin/pilight.mjs` or `pnpm run cli -- <command>`:
 
 Target can be specified as a friendly name (`tally01`, `cam1`), a unit number (`1`, `2`), an mDNS hostname (`tally01.local`), or a direct IP address:
 
@@ -87,7 +87,7 @@ POST /api/v1/lights/tally01/segments
 
 ## HTTP REST API
 
-When running the service daemon (`npm start` or `pilight serve` on default port `3200`):
+When running the service daemon (`pnpm start` or `pilight serve` on default port `3200`):
 
 | Method | Endpoint | Description |
 |---|---|---|

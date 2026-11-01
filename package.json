@@ -4,6 +4,7 @@
   "description": "Tally light controller service and CLI for Tally-Ma wireless tally lights over UDP, HTTP, and Cloud/MQTT",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.23.0",
   "engines": {
     "node": ">=22"
   },
@@ -31,5 +32,14 @@
   "files": [
     "dist",
     "bin"
-  ]
+  ],
+  "pi": {
+    "service": "pilight",
+    "displayName": "PiLight",
+    "layer": "southbound-hardware",
+    "port": 3200,
+    "ports": {},
+    "healthEndpoint": "/health",
+    "envPortVar": "PILIGHT_PORT"
+  }
 }

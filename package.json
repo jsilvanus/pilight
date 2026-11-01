@@ -1,0 +1,17 @@
+{
+  "name": "pilight",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Tally light service for the Pi: lamps follow the ATEM camera tally, the encoder or the YouTube status, or are set by hand. Talks only to pigateway.",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node --test test/*.test.js",
+    "cli": "node cli/cli.mjs"
+  },
+  "bin": { "pilight": "bin/pilight.mjs" },
+  "files": ["src", "cli", "bin", "openapi", "config", "README.md", "LICENSE"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/jsilvanus/pilight.git" }
+}

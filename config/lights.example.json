@@ -1,0 +1,22 @@
+{
+  "lights": [
+    {
+      "id": "cam1",
+      "name": "Kamera 1",
+      "atemInput": 1,
+      "encoder": "any",
+      "look": { "PGM": "#ff0000", "PRV": "#00ff00" },
+      "outputs": [
+        { "type": "tally-ma", "host": "192.168.1.50" }
+      ]
+    },
+    {
+      "id": "cam2",
+      "name": "Kamera 2",
+      "atemInput": 2,
+      "outputs": [
+        { "type": "console" }
+      ]
+    }
+  ]
+}

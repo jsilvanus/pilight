@@ -1,0 +1,154 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "pilight",
+    "version": "0.1.0",
+    "description": "Tally light service: each light follows the ATEM camera tally, the encoder or the YouTube status, or is set by hand. Reads are open; writes need the API key as a bearer token or X-Api-Key."
+  },
+  "servers": [{ "url": "http://127.0.0.1:3300" }],
+  "tags": [{ "name": "System" }, { "name": "Mode" }, { "name": "Lights" }],
+  "components": {
+    "securitySchemes": {
+      "apiKey": { "type": "http", "scheme": "bearer" }
+    },
+    "schemas": {
+      "Mode": { "type": "string", "enum": ["manual", "atem", "encoder", "youtube"] },
+      "Rgb": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 255 }, "minItems": 3, "maxItems": 3 },
+      "Light": {
+        "type": "object",
+        "required": ["id", "name", "mode", "state", "rgb", "blink"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "mode": { "$ref": "#/components/schemas/Mode" },
+          "state": { "type": "string", "enum": ["PGM", "PRV", "LIVE", "DEGRADED", "STARTING", "OFF", "MANUAL", "UNKNOWN"] },
+          "detail": { "type": ["string", "null"] },
+          "rgb": { "$ref": "#/components/schemas/Rgb" },
+          "blink": { "type": "boolean" },
+          "manual": {
+            "type": ["object", "null"],
+            "properties": { "color": { "type": "string" }, "blink": { "type": "boolean" } }
+          }
+        }
+      },
+      "FeedStatus": {
+        "type": "object",
+        "properties": { "fresh": { "type": "boolean" }, "lastOkAt": { "type": ["integer", "null"] } }
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "mode": { "$ref": "#/components/schemas/Mode" },
+          "feeds": {
+            "type": "object",
+            "properties": {
+              "atem": { "$ref": "#/components/schemas/FeedStatus" },
+              "encoder": { "$ref": "#/components/schemas/FeedStatus" },
+              "youtube": { "$ref": "#/components/schemas/FeedStatus" }
+            }
+          },
+          "lights": { "type": "array", "items": { "$ref": "#/components/schemas/Light" } }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": { "code": { "type": "string" }, "message": { "type": "string" } }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "tags": ["System"],
+        "summary": "Liveness",
+        "responses": { "200": { "description": "Running", "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean" } } } } } } }
+      }
+    },
+    "/api/v1/status": {
+      "get": {
+        "operationId": "getStatus",
+        "tags": ["System"],
+        "summary": "Mode, feed freshness and every light",
+        "responses": { "200": { "description": "Status", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Status" } } } } }
+      }
+    },
+    "/api/v1/mode": {
+      "get": {
+        "operationId": "getMode",
+        "tags": ["Mode"],
+        "summary": "The current mode",
+        "responses": { "200": { "description": "Mode", "content": { "application/json": { "schema": { "type": "object", "properties": { "mode": { "$ref": "#/components/schemas/Mode" }, "modes": { "type": "array", "items": { "$ref": "#/components/schemas/Mode" } } } } } } } }
+      },
+      "put": {
+        "operationId": "setMode",
+        "tags": ["Mode"],
+        "summary": "Switch every light to another mode",
+        "security": [{ "apiKey": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["mode"], "properties": { "mode": { "$ref": "#/components/schemas/Mode" } } } } } },
+        "responses": {
+          "200": { "description": "New mode", "content": { "application/json": { "schema": { "type": "object", "properties": { "mode": { "$ref": "#/components/schemas/Mode" } } } } } },
+          "401": { "description": "API key missing or wrong", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "422": { "description": "Unknown mode", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/lights": {
+      "get": {
+        "operationId": "listLights",
+        "tags": ["Lights"],
+        "summary": "All lights and what they show now",
+        "responses": { "200": { "description": "Lights", "content": { "application/json": { "schema": { "type": "object", "properties": { "lights": { "type": "array", "items": { "$ref": "#/components/schemas/Light" } } } } } } } }
+      }
+    },
+    "/api/v1/lights/{id}": {
+      "get": {
+        "operationId": "getLight",
+        "tags": ["Lights"],
+        "summary": "One light",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Light", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Light" } } } },
+          "404": { "description": "No such light", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/lights/{id}/manual": {
+      "put": {
+        "operationId": "setLightManual",
+        "tags": ["Lights"],
+        "summary": "Set the colour of one light by hand (shown in manual mode; kept for later)",
+        "security": [{ "apiKey": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["color"],
+                "properties": {
+                  "color": { "type": "string", "description": "#rrggbb, or \"off\" for dark" },
+                  "blink": { "type": "boolean", "default": false }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "The light", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Light" } } } },
+          "401": { "description": "API key missing or wrong", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "No such light", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "422": { "description": "Invalid colour or blink", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    }
+  }
+}

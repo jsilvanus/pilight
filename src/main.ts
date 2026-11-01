@@ -2,7 +2,7 @@ import { createServer } from './server.js';
 import { TallyManager } from './manager.js';
 import { type TallyLightConfig } from './types.js';
 
-const PORT = parseInt(process.env.PILIGHT_PORT ?? '3200', 10);
+const PORT = parseInt(process.env.PILIGHT_PORT ?? '3107', 10);
 const HOST = process.env.PILIGHT_HOST ?? '0.0.0.0';
 const CLOUD_BROKER = process.env.PILIGHT_CLOUD_BROKER;
 

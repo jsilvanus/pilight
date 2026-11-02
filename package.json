@@ -19,15 +19,15 @@
     "pitally": "bin/pitally.mjs"
   },
   "dependencies": {
-    "fastify": "^5.2.0",
+    "fastify": "^5.2.1",
     "mqtt": "^5.10.3",
     "multicast-dns": "^7.2.5"
   },
   "devDependencies": {
     "@types/multicast-dns": "^7.2.4",
-    "@types/node": "^22.13.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.7.3"
+    "@types/node": "^24.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.9.0"
   },
   "files": [
     "dist",

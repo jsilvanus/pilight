@@ -2,24 +2,24 @@ import { createServer } from './server.js';
 import { TallyManager } from './manager.js';
 import { type TallyLightConfig } from './types.js';
 
-const PORT = parseInt(process.env.PILIGHT_PORT ?? '3107', 10);
-const HOST = process.env.PILIGHT_HOST ?? '0.0.0.0';
-const CLOUD_BROKER = process.env.PILIGHT_CLOUD_BROKER;
+const PORT = parseInt(process.env.PITALLY_PORT ?? '3107', 10);
+const HOST = process.env.PITALLY_HOST ?? '0.0.0.0';
+const CLOUD_BROKER = process.env.PITALLY_CLOUD_BROKER;
 
 const manager = new TallyManager({
   cloudBrokerUrl: CLOUD_BROKER,
 });
 
-// Load initial devices from PILIGHT_DEVICES environment variable if present
-if (process.env.PILIGHT_DEVICES) {
+// Load initial devices from PITALLY_DEVICES environment variable if present
+if (process.env.PITALLY_DEVICES) {
   try {
-    const initialDevices: TallyLightConfig[] = JSON.parse(process.env.PILIGHT_DEVICES);
+    const initialDevices: TallyLightConfig[] = JSON.parse(process.env.PITALLY_DEVICES);
     for (const dev of initialDevices) {
       manager.registerDevice(dev);
-      console.log(`[pilight] Pre-registered device: ${dev.id} (${dev.ip})`);
+      console.log(`[pitally] Pre-registered device: ${dev.id} (${dev.ip})`);
     }
   } catch (err: any) {
-    console.error('[pilight] Failed to parse PILIGHT_DEVICES:', err.message);
+    console.error('[pitally] Failed to parse PITALLY_DEVICES:', err.message);
   }
 }
 
@@ -34,13 +34,13 @@ if (process.env.PIGATEWAY_URL) {
 }
 
 server.start().catch((err) => {
-  console.error('[pilight] Failed to start server:', err);
+  console.error('[pitally] Failed to start server:', err);
   process.exit(1);
 });
 
 // Graceful shutdown
 const shutdown = async () => {
-  console.log('[pilight] Shutting down...');
+  console.log('[pitally] Shutting down...');
   await server.stop();
   process.exit(0);
 };

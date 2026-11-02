@@ -1,10 +1,10 @@
-# pilight
+# pitally
 
 Tally light controller service and CLI for **Tally-Ma Wireless Tally Lights**, designed for the Raspberry Pi production ecosystem.
 
 ## Protocol Scope & Architecture
 
-- **mDNS Hostnames with IP Fallback**: By default, targets resolve to mDNS hostnames (`tally01.local` through `tally08.local`). If an mDNS name lookup fails or is unavailable on the network, `pilight` automatically fails over to the configured fallback IP (e.g. `192.168.1.70`, `192.168.1.89`).
+- **mDNS Hostnames with IP Fallback**: By default, targets resolve to mDNS hostnames (`tally01.local` through `tally08.local`). If an mDNS name lookup fails or is unavailable on the network, `pitally` automatically fails over to the configured fallback IP (e.g. `192.168.1.70`, `192.168.1.89`).
 - **HTTP for Solid Tally States**: All solid tally updates (`/PGM`, `/PRV`, `/NONE`), color cues (`/COLOR`), brightness, hold data (`/HOLDDATA`), and talent calls (`/CALL`) are sent over HTTP.
 - **UDP for Multi-Status Segments & Animations**: The 29-byte binary protocol on port `21324` (`0x02 0x05 [9 x RGB]`) is used for:
   - **Free Segmenting**: Splitting the 9 LEDs into 2 or 3 custom groups to display concurrent statuses (e.g. YouTube stream, ATEM recording, and projector status on one light).
@@ -28,38 +28,38 @@ pnpm test
 
 ## CLI Usage
 
-Run directly with `node bin/pilight.mjs` or `pnpm run cli -- <command>`:
+Run directly with `node bin/pitally.mjs` or `pnpm run cli -- <command>`:
 
 Target can be specified as a friendly name (`tally01`, `cam1`), a unit number (`1`, `2`), an mDNS hostname (`tally01.local`), or a direct IP address:
 
 ```sh
 # Standard tally states (HTTP by default, mDNS with IP fallback)
-pilight set tally01 pgm                 # Sends HTTP /PGM
-pilight set 1 pgm                       # Unit number shortcut -> tally01.local
-pilight set tally02 prv                 # Sends HTTP /PRV to tally02.local
-pilight set tally01 off                 # Sends HTTP /NONE
-pilight set tally01 #FF8800             # Sends HTTP /COLOR?HEX=FF8800
+pitally set tally01 pgm                 # Sends HTTP /PGM
+pitally set 1 pgm                       # Unit number shortcut -> tally01.local
+pitally set tally02 prv                 # Sends HTTP /PRV to tally02.local
+pitally set tally01 off                 # Sends HTTP /NONE
+pitally set tally01 #FF8800             # Sends HTTP /COLOR?HEX=FF8800
 
 # Camera Director / PTZ Cues (UDP animations)
-pilight cue 1 pan-left                  # Flashes leftward LEDs to cue camera pan left
-pilight cue 1 pan-right                 # Flashes rightward LEDs to cue camera pan right
-pilight cue 1 zoom-in                   # Expanding pulse to cue zoom in
-pilight cue 1 zoom-out                  # Contracting pulse to cue zoom out
-pilight cue 1 operator-call             # Flashes rear LEDs (1 & 9) for operator attention
+pitally cue 1 pan-left                  # Flashes leftward LEDs to cue camera pan left
+pitally cue 1 pan-right                 # Flashes rightward LEDs to cue camera pan right
+pitally cue 1 zoom-in                   # Expanding pulse to cue zoom in
+pitally cue 1 zoom-out                  # Contracting pulse to cue zoom out
+pitally cue 1 operator-call             # Flashes rear LEDs (1 & 9) for operator attention
 
 # Diagnostic: Cycle through all 9 LEDs
-pilight cycle 1                         # Sequentially lights up LEDs 1..9 in Red, Green, Amber
+pitally cycle 1                         # Sequentially lights up LEDs 1..9 in Red, Green, Amber
 
 # Operator call & hold data (HTTP)
-pilight call tally01                    # Flashes white 3x via HTTP /CALL
-pilight hold tally01 1                  # Suppresses external server updates via HTTP /HOLDDATA?H=1
-pilight brightness tally01 high         # Sets brightness via HTTP /HIGH
+pitally call tally01                    # Flashes white 3x via HTTP /CALL
+pitally hold tally01 1                  # Suppresses external server updates via HTTP /HOLDDATA?H=1
+pitally brightness tally01 high         # Sets brightness via HTTP /HIGH
 
 # Moving animations (Strictly UDP port 21324)
-pilight rainbow tally01 --duration 5 --fps 20
+pitally rainbow tally01 --duration 5 --fps 20
 
 # Start HTTP REST API daemon
-pilight serve --port 3107
+pitally serve --port 3107
 ```
 
 ---
@@ -87,7 +87,7 @@ POST /api/v1/lights/tally01/segments
 
 ## HTTP REST API
 
-When running the service daemon (`pnpm start` or `pilight serve` on default port `3107`):
+When running the service daemon (`pnpm start` or `pitally serve` on default port `3107`):
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -116,8 +116,8 @@ When running the service daemon (`pnpm start` or `pilight serve` on default port
 
 ## Environment Variables
 
-- `PILIGHT_PORT`: HTTP server listen port (default `3107`).
-- `PILIGHT_HOST`: HTTP server bind host (default `0.0.0.0`).
+- `PITALLY_PORT`: HTTP server listen port (default `3107`).
+- `PITALLY_HOST`: HTTP server bind host (default `0.0.0.0`).
 - `PIGATEWAY_URL`: URL to connect to `pigateway` SSE (e.g. `http://127.0.0.1:3000`).
-- `PILIGHT_CLOUD_BROKER`: Optional MQTT broker URL (e.g. `mqtt://jnsl.asuscomm.com:18069`).
-- `PILIGHT_DEVICES`: Optional JSON array of initial devices to register on startup.
+- `PITALLY_CLOUD_BROKER`: Optional MQTT broker URL (e.g. `mqtt://jnsl.asuscomm.com:18069`).
+- `PITALLY_DEVICES`: Optional JSON array of initial devices to register on startup.

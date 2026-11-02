@@ -33,7 +33,7 @@ export function createServer(options?: ServerOptions | undefined): {
 
   // 1. Health check
   app.get('/health', async () => {
-    return { status: 'ok', service: 'pilight' };
+    return { status: 'ok', service: 'pitally' };
   });
 
   // 2. Service status
@@ -388,7 +388,7 @@ export function createServer(options?: ServerOptions | undefined): {
     coordinator,
     start: async () => {
       const address = await app.listen({ port, host });
-      console.log(`[pilight] Server listening on ${address}`);
+      console.log(`[pitally] Server listening on ${address}`);
       return address;
     },
     stop: async () => {

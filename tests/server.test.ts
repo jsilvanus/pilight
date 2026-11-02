@@ -22,7 +22,7 @@ test('Server endpoints: health, registration, state, batch, and delete', async (
       url: '/health',
     });
     assert.equal(healthRes.statusCode, 200);
-    assert.deepEqual(healthRes.json(), { status: 'ok', service: 'pilight' });
+    assert.deepEqual(healthRes.json(), { status: 'ok', service: 'pitally' });
 
     // 2. Register light
     const regRes = await app.inject({

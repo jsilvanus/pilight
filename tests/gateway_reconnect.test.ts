@@ -4,7 +4,7 @@ import test from 'node:test';
 import { FacetCoordinator } from '../src/coordinator.js';
 import { TallyManager } from '../src/manager.js';
 
-test('PiLight keeps following the gateway after a clean end of the event stream', async () => {
+test('PiTally keeps following the gateway after a clean end of the event stream', async () => {
   let connections = 0;
   const server = createServer((_req, res) => {
     connections += 1;
@@ -25,7 +25,7 @@ test('PiLight keeps following the gateway after a clean end of the event stream'
   }
 });
 
-test('PiLight does not fail when the gateway is not there', async () => {
+test('PiTally does not fail when the gateway is not there', async () => {
   const coordinator = new FacetCoordinator(new TallyManager({ disableDiscovery: true }));
   coordinator.startPiGatewayListener('http://127.0.0.1:1');
   await new Promise((r) => setTimeout(r, 300));

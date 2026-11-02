@@ -257,7 +257,7 @@ export class FacetCoordinator extends EventEmitter {
         if (err.name === 'AbortError') return;
         console.warn(`[FacetCoordinator] PiGateway SSE disconnected (${err.message}). Retrying in 3s...`);
       }
-      // PiLight works without the gateway: keep trying, also after a clean end of the stream.
+      // PiTally works without the gateway: keep trying, also after a clean end of the stream.
       if (signal.aborted) return;
       this.sseRetryTimer = setTimeout(() => {
         this.sseRetryTimer = null;

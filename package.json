@@ -1,5 +1,5 @@
 {
-  "name": "pilight",
+  "name": "pitally",
   "version": "0.1.0",
   "description": "Tally light controller service and CLI for Tally-Ma wireless tally lights over UDP, HTTP, and Cloud/MQTT",
   "private": true,
@@ -16,7 +16,7 @@
     "cli": "tsx src/cli.ts"
   },
   "bin": {
-    "pilight": "bin/pilight.mjs"
+    "pitally": "bin/pitally.mjs"
   },
   "dependencies": {
     "fastify": "^5.2.0",
@@ -34,12 +34,12 @@
     "bin"
   ],
   "pi": {
-    "service": "pilight",
-    "displayName": "PiLight",
+    "service": "pitally",
+    "displayName": "PiTally",
     "layer": "Layer 1: Southbound hardware",
     "port": 3107,
     "ports": {},
     "healthEndpoint": "/health",
-    "envPortVar": "PILIGHT_PORT"
+    "envPortVar": "PITALLY_PORT"
   }
 }

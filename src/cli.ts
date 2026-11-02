@@ -95,7 +95,7 @@ function hsvToRgb(h: number, s: number, v: number): RGB {
 
 function printHelp(): void {
   console.log(`
-pilight - Tally light controller for Tally-Ma wireless tally lights
+pitally - Tally light controller for Tally-Ma wireless tally lights
 
 Scope:
   - Defaults to mDNS names (e.g. tally01.local, tally02.local) with IP fallback.
@@ -103,17 +103,17 @@ Scope:
   - UDP is strictly reserved for high-rate moving animations.
 
 Usage:
-  pilight discover [--timeout <sec>]
-  pilight set <target> <color|mode> [--udp]
-  pilight cue <target> <pan-left|pan-right|zoom-in|zoom-out|operator-call>
-  pilight cycle <target> [--speed <ms>]
-  pilight call <target>
-  pilight hold <target> [1|0]
-  pilight brightness <target> <low|medium|high>
-  pilight rainbow <target> [--duration <sec>] [--fps <fps>]
-  pilight cloud <target> <on|off> [--server <host>] [--port <port>]
-  pilight serve [--port <port>] [--cloud <brokerUrl>]
-  pilight help
+  pitally discover [--timeout <sec>]
+  pitally set <target> <color|mode> [--udp]
+  pitally cue <target> <pan-left|pan-right|zoom-in|zoom-out|operator-call>
+  pitally cycle <target> [--speed <ms>]
+  pitally call <target>
+  pitally hold <target> [1|0]
+  pitally brightness <target> <low|medium|high>
+  pitally rainbow <target> [--duration <sec>] [--fps <fps>]
+  pitally cloud <target> <on|off> [--server <host>] [--port <port>]
+  pitally serve [--port <port>] [--cloud <brokerUrl>]
+  pitally help
 
 Target formats:
   tally01             Resolves to tally01.local (fallback: 192.168.1.70)
@@ -123,19 +123,19 @@ Target formats:
   192.168.1.70        Direct IP address
 
 Examples:
-  pilight set tally01 pgm                 # Sends HTTP /PGM to tally01.local
-  pilight set 1 pgm                       # Same as above
-  pilight cue 1 pan-left                  # Flashes left/operator LEDs to cue camera operator
-  pilight cue 1 zoom-in                   # Expanding pulse to cue zoom in
-  pilight cycle 1                         # Sequentially cycles each of the 9 LEDs to test order
-  pilight set tally02 prv                 # Sends HTTP /PRV to tally02.local
-  pilight set tally01 off                 # Sends HTTP /NONE
-  pilight set tally01 #FFAA00             # Sends HTTP /COLOR?HEX=FFAA00
-  pilight call tally01                    # Sends HTTP /CALL (flash 3x)
-  pilight hold tally01 1                  # Sends HTTP /HOLDDATA?H=1
-  pilight brightness tally01 high         # Sends HTTP /HIGH
-  pilight rainbow tally01 --duration 5    # Streams moving rainbow via UDP (port 21324)
-  pilight serve --port 3107               # Starts HTTP REST API daemon
+  pitally set tally01 pgm                 # Sends HTTP /PGM to tally01.local
+  pitally set 1 pgm                       # Same as above
+  pitally cue 1 pan-left                  # Flashes left/operator LEDs to cue camera operator
+  pitally cue 1 zoom-in                   # Expanding pulse to cue zoom in
+  pitally cycle 1                         # Sequentially cycles each of the 9 LEDs to test order
+  pitally set tally02 prv                 # Sends HTTP /PRV to tally02.local
+  pitally set tally01 off                 # Sends HTTP /NONE
+  pitally set tally01 #FFAA00             # Sends HTTP /COLOR?HEX=FFAA00
+  pitally call tally01                    # Sends HTTP /CALL (flash 3x)
+  pitally hold tally01 1                  # Sends HTTP /HOLDDATA?H=1
+  pitally brightness tally01 high         # Sends HTTP /HIGH
+  pitally rainbow tally01 --duration 5    # Streams moving rainbow via UDP (port 21324)
+  pitally serve --port 3107               # Starts HTTP REST API daemon
 `);
 }
 
@@ -377,7 +377,7 @@ export async function runCli(args: string[]): Promise<void> {
     return;
   }
 
-  console.error(`Unknown command: "${command}". Run "pilight help" for usage.`);
+  console.error(`Unknown command: "${command}". Run "pitally help" for usage.`);
   process.exit(1);
 }
 

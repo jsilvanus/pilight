@@ -1,5 +1,5 @@
 /**
- * Core type definitions for pilight and Tally-Ma tally light control.
+ * Core type definitions for pitally and Tally-Ma tally light control.
  */
 
 export type RGB = [number, number, number];
